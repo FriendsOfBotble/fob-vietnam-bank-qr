@@ -25,6 +25,10 @@ Vào **Bảng quản trị (Admin)** và chọn **Plugins**. Bấm vào nút "Th
 2. Giải nén file nén vào thư mục `platform/plugins`.
 3. Vào **Bảng quản trị (Admin)** và chọn **Plugins** và bấm vào nút **Kích hoạt (Activate)**.
 
+Xem video hướng dẫn cấu hình tại đây:
+
+https://youtu.be/VPLoNB6Y230?si=B9yr67fAzqqKqkpn
+
 ## Lịch sử thay đổi
 
 Vui lòng xem [LỊCH SỬ THAY ĐỔI](CHANGELOG.md) để xem chi tiết.
