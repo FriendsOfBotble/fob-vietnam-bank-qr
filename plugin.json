@@ -1,0 +1,11 @@
+{
+    "id": "friendsofbotble/fob-vietnam-bank-qr",
+    "name": "Mã QR Chuyển Tiền Ngân Hàng Việt Nam",
+    "namespace": "FriendsOfBotble\\VietnamBankQr\\",
+    "provider": "FriendsOfBotble\\VietnamBankQr\\Providers\\VietnamBankQrServiceProvider",
+    "author": "Friends Of Botble",
+    "url": "https://github.com/FriendsOfBotble",
+    "version": "1.0.0",
+    "description": "Plugin này dùng để hiển thị mã QR chuyển tiền hay dùng phương thức chuyển khoản ngân hàng Việt Nam.",
+    "minimum_core_version": "7.2.3"
+}
