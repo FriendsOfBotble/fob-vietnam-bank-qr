@@ -11,6 +11,7 @@ use Botble\Base\Traits\LoadAndPublishDataTrait;
 use Botble\Ecommerce\Models\Currency;
 use Botble\Ecommerce\Models\Order;
 use Botble\Payment\Enums\PaymentMethodEnum;
+use Botble\Payment\Enums\PaymentStatusEnum;
 use Botble\Payment\Forms\BankTransferPaymentMethodForm;
 use FriendsOfBotble\VietnamBankQr\VietQR;
 use Illuminate\Support\Collection;
@@ -39,6 +40,7 @@ class VietnamBankQrServiceProvider extends ServiceProvider
                     SelectField::class,
                     SelectFieldOption::make()
                         ->label('Ngân hàng')
+                        ->helperText('Chọn ngân hàng để tạo mã QR thanh toán.')
                         ->choices(
                             collect(VietQR::getBanksList())
                                 ->mapWithKeys(fn ($bank) => [$bank['bin'] => "{$bank['short_name']} - {$bank['name']}"])
@@ -53,6 +55,8 @@ class VietnamBankQrServiceProvider extends ServiceProvider
                     TextField::class,
                     TextFieldOption::make()
                         ->label('Chủ tài khoản')
+                        ->placeholder('Nhập tên chủ tài khoản')
+                        ->helperText('Tên chủ tài khoản ngân hàng hiển thị trên mã QR.')
                         ->value(get_payment_setting('vietnam_bank_account_name', $paymentMethod))
                         ->toArray()
                 )
@@ -62,6 +66,8 @@ class VietnamBankQrServiceProvider extends ServiceProvider
                     TextField::class,
                     TextFieldOption::make()
                         ->label('Số tài khoản')
+                        ->placeholder('Nhập số tài khoản')
+                        ->helperText('Số tài khoản ngân hàng nhận tiền.')
                         ->value(get_payment_setting('vietnam_bank_account_number', $paymentMethod))
                         ->toArray()
                 )
@@ -71,13 +77,14 @@ class VietnamBankQrServiceProvider extends ServiceProvider
                     TextField::class,
                     TextFieldOption::make()
                         ->label('Nội dung chuyển khoản')
+                        ->placeholder('Ví dụ: Thanh toan don hang [ma_don_hang]')
                         ->value(get_payment_setting('vietnam_bank_description_template', $paymentMethod, VietQR::getDefaultTransferDescription()))
                         ->helperText('Bạn có thể dùng [ma_don_hang] để hiển thị mã đơn trong nội dung chuyển khoản, vui lòng dùng Tiếng Việt không dấu và không chứa ký tự đặc biệt.')
                         ->toArray()
                 );
         });
 
-        add_filter('ecommerce_thank_you_customer_info', function (string|null $html, Collection|Order $orders) {
+        add_filter('ecommerce_thank_you_customer_info', function (?string $html, Collection|Order $orders) {
             if (! VietQR::isEnabled()) {
                 return $html;
             }
@@ -86,6 +93,20 @@ class VietnamBankQrServiceProvider extends ServiceProvider
                 $collection = new Collection();
                 $collection->add($orders);
                 $orders = $collection;
+            }
+
+            $firstOrder = $orders->first();
+
+            if (! $firstOrder || ! $firstOrder->payment) {
+                return $html;
+            }
+
+            if ($firstOrder->payment->payment_channel->getValue() !== PaymentMethodEnum::BANK_TRANSFER) {
+                return $html;
+            }
+
+            if ($firstOrder->payment->status->getValue() !== PaymentStatusEnum::PENDING) {
+                return $html;
             }
 
             $currentCurrency = $supportedCurrency = get_application_currency();
