@@ -28,6 +28,7 @@ class VietnamBankQrServiceProvider extends ServiceProvider
 
         $this
             ->setNamespace('plugins/fob-vietnam-bank-qr')
+            ->loadAndPublishConfigurations(['fallback-banks', 'vietqr'])
             ->loadAndPublishViews();
 
         BankTransferPaymentMethodForm::extend(function (BankTransferPaymentMethodForm $form) {
@@ -129,7 +130,7 @@ class VietnamBankQrServiceProvider extends ServiceProvider
 
             foreach ($orders as $item) {
                 $orderAmount += $item->amount;
-                $orderCode .= $item->code . ', ';
+                $orderCode .= $item->code.', ';
             }
 
             $orderCode = rtrim(trim($orderCode), ',');
